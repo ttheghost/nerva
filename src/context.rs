@@ -13,7 +13,7 @@ pub struct Diagnostic {
 
 pub struct CompilerCtx {
     pub interner: Interner,
-    pub ast_arena: AstArena,
+    pub ast: AstArena,
 
     pub diagnostics: Vec<Diagnostic>,
 
@@ -26,7 +26,7 @@ impl CompilerCtx {
     pub fn new(target: &str) -> Self {
         CompilerCtx {
             interner: Interner::new(),
-            ast_arena: AstArena::new(),
+            ast: AstArena::new(),
             diagnostics: Vec::new(),
             target: target.to_string(),
             current_pass: "Init"

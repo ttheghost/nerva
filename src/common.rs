@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+use std::hash::Hash;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Span {
     pub start: u32,
@@ -15,24 +18,27 @@ pub struct Symbol(pub u32);
 
 pub struct Interner {
     strings: Vec<String>,
+    map: HashMap<String, u32>
 }
 
 impl Interner {
     pub fn new() -> Self {
-        Self { strings: vec![] }
+        Self { strings: vec![], map: HashMap::new() }
     }
 
     pub fn intern(&mut self, s: &str) -> Symbol {
-        if let Some(idx) = self.strings.iter().position(|r| r == s) {
-            Symbol(idx as u32)
+        if let Some(idx) = self.map.get(s) {
+            Symbol(*idx)
         } else {
-            let idx = self.strings.len();
+            let idx = self.strings.len() as u32;
             self.strings.push(s.to_string());
-            Symbol(idx as u32)
+            self.map.insert(s.to_string(), idx);
+            Symbol(idx)
         }
     }
     
     pub fn resolve(&self, symbol: Symbol) -> &str {
+        debug_assert!(symbol.0 < self.strings.len() as u32);
         &self.strings[symbol.0 as usize]
     }
 }

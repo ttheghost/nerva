@@ -52,6 +52,7 @@ pub enum StmtKind {
         name: Symbol,
         init: ExprId,
         ty: Option<TypeId>,
+        mutable: bool
     },
     Expr(ExprId),
 }
