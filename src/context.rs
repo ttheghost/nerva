@@ -1,5 +1,5 @@
 use crate::common::{Interner, Span, Symbol};
-use crate::ast::AstArena;
+use crate::ast::Ast;
 
 #[derive(Debug)]
 pub enum DiagnosticLevel { Info, Warning, Error }
@@ -13,7 +13,7 @@ pub struct Diagnostic {
 
 pub struct CompilerCtx {
     pub interner: Interner,
-    pub ast: AstArena,
+    pub ast: Ast,
 
     pub diagnostics: Vec<Diagnostic>,
 
@@ -23,10 +23,10 @@ pub struct CompilerCtx {
 }
 
 impl CompilerCtx {
-    pub fn new(target: &str) -> Self {
+    pub fn new(target: &str, arena_chunk_size: usize) -> Self {
         CompilerCtx {
             interner: Interner::new(),
-            ast: AstArena::new(),
+            ast: Ast::new(arena_chunk_size),
             diagnostics: Vec::new(),
             target: target.to_string(),
             current_pass: "Init"
