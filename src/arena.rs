@@ -41,6 +41,7 @@ impl<T> Arena<T> {
         }
     }
 
+    #[inline]
     pub fn alloc(&mut self, item: T) -> NodeId<T> {
         let idx = self.len();
         self.chunk.push(item);
@@ -52,6 +53,7 @@ impl<T> Arena<T> {
         NodeId::new(idx as u32)
     }
 
+    #[inline]
     pub fn get(&self, id: NodeId<T>) -> &T {
         let idx = id.index();
         let chunk_id = idx / self.chunk_size;
@@ -63,6 +65,7 @@ impl<T> Arena<T> {
         }
     }
 
+    #[inline]
     pub fn get_mut(&mut self, id: NodeId<T>) -> &mut T {
         let idx = id.index();
         let chunk_id = idx / self.chunk_size;
