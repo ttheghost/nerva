@@ -35,8 +35,8 @@ pub struct Arena<T> {
 impl<T> Arena<T> {
     pub fn new(chunk_size: usize) -> Arena<T> {
         Self {
-            chunks: vec![],
-            chunk: vec![],
+            chunks: Vec::new(),
+            chunk: Vec::with_capacity(chunk_size),
             chunk_size,
         }
     }
@@ -77,7 +77,69 @@ impl<T> Arena<T> {
         }
     }
 
+    #[inline]
     pub fn len(&self) -> usize {
         self.chunks.len() * self.chunk_size + self.chunk.len()
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool { self.len() == 0 }
+
+    pub fn iter_ids(&self) -> impl Iterator<Item = NodeId<T>> {
+        debug_assert!(u32::MAX as usize >= self.len());
+        (0..self.len()).map(|id| NodeId::new(id as u32))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_basic_allocation() {
+        let mut arena = Arena::new(4);
+
+        let id1 = arena.alloc(42);
+        let id2 = arena.alloc(100);
+
+        assert_eq!(*arena.get(id1), 42);
+        assert_eq!(*arena.get(id2), 100);
+        assert_eq!(arena.len(), 2);
+    }
+
+    #[test]
+    fn test_mutation() {
+        let mut arena = Arena::new(4);
+        let id1 = arena.alloc(10);
+
+        *arena.get_mut(id1) = 20;
+        assert_eq!(*arena.get(id1), 20);
+    }
+
+    #[test]
+    fn test_chunking() {
+        let mut arena = Arena::new(2);
+
+        let id1 = arena.alloc(1);
+        let id2 = arena.alloc(2);
+        let id3 = arena.alloc(3); // Should trigger new chunk
+
+
+        assert_eq!(*arena.get(id1), 1);
+        assert_eq!(*arena.get(id2), 2);
+        assert_eq!(*arena.get(id3), 3);
+        assert_eq!(arena.chunks.len(), 1);
+        assert_eq!(arena.len(), 3);
+    }
+
+    #[test]
+    fn test_iterator() {
+        let mut arena = Arena::new(4);
+        arena.alloc(1);
+        arena.alloc(2);
+        arena.alloc(3);
+        
+        let sum: i32 = arena.iter_ids().map(|id| *arena.get(id)).sum();
+        assert_eq!(sum, 6);
     }
 }
