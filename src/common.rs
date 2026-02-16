@@ -16,12 +16,12 @@ impl Span {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Symbol(pub u32);
 
-pub struct Interner {
+pub struct SymbolInterner {
     strings: Vec<String>,
     map: HashMap<String, u32>
 }
 
-impl Interner {
+impl SymbolInterner {
     pub fn new() -> Self {
         Self { strings: vec![], map: HashMap::new() }
     }

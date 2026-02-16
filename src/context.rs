@@ -1,4 +1,4 @@
-use crate::common::{Interner, Span, Symbol};
+use crate::common::{SymbolInterner, Span, Symbol};
 use crate::ast::Ast;
 
 #[derive(Debug)]
@@ -12,7 +12,7 @@ pub struct Diagnostic {
 }
 
 pub struct CompilerCtx {
-    pub interner: Interner,
+    pub symbol_interner: SymbolInterner,
     pub ast: Ast,
 
     pub diagnostics: Vec<Diagnostic>,
@@ -25,7 +25,7 @@ pub struct CompilerCtx {
 impl CompilerCtx {
     pub fn new(target: &str, arena_chunk_size: usize) -> Self {
         CompilerCtx {
-            interner: Interner::new(),
+            symbol_interner: SymbolInterner::new(),
             ast: Ast::new(arena_chunk_size),
             diagnostics: Vec::new(),
             target: target.to_string(),
@@ -35,10 +35,6 @@ impl CompilerCtx {
 
     pub fn report(&mut self, level: DiagnosticLevel, message: &str, span: Span) {
         self.diagnostics.push(Diagnostic { level, message: message.to_string(), span })
-    }
-
-    pub fn intern(&mut self, s: &str) -> Symbol {
-        self.interner.intern(s)
     }
 
     pub fn has_errors(&self) -> bool {
